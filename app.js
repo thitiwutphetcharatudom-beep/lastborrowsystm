@@ -132,14 +132,18 @@ function renderStatus() {
 
         let statusText = "ยืมอยู่";
         let fine = 0;
-        if (diffDays > 7) {
-          statusText = "เกินกำหนด (" + diffDays + " วัน)";
-          fine = (diffDays - 7) * 10;
+        
+        // จำนวนวันที่เกินกำหนด (ถ้ามี)
+        const lateDays = diffDays > 7 ? diffDays - 7 : 0; 
+        
+        if (lateDays > 0) {
+          statusText = "เกินกำหนด (" + lateDays + " วัน)"; // 👈 แสดงจำนวนวัน *ที่เกินกำหนด*
+          fine = lateDays * 10; // 👈 คำนวณค่าปรับ 10 บาทต่อวัน (ถูกต้องตามโค้ดเดิม)
 
           // 🔔 ส่งอีเมลแจ้งเตือนคืนช้า
-          sendLateReturnEmail(device.name, `\nผู้ยืม: ${record.firstname} ${record.lastname} (${record.department})\nยืมวันที่: ${borrowDate.toLocaleDateString()}\nเกินกำหนด: ${diffDays - 7} วัน`);
+          sendLateReturnEmail(device.name, `\nผู้ยืม: ${record.firstname} ${record.lastname} (${record.department})\nยืมวันที่: ${borrowDate.toLocaleDateString()}\nเกินกำหนด: ${lateDays} วัน`);
         }
-
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${device.name}</td>
@@ -247,4 +251,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDevices();
   populateDeviceOptions();
   renderStatus();
+
 });
